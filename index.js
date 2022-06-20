@@ -2,7 +2,8 @@ const {Scenes, session, Telegraf} = require('telegraf');
 
 require('dotenv').config()
 
-const index = new Telegraf(process.env.TOKEN)
+const index = new Telegraf('5333642362:AAHWgFsRXBTFyfnHj6vvZFXJTY8mTt4AwBo')
+// const index = new Telegraf(process.env.TOKEN)
 
 
 const SceneGenerator = require('./src/scene')
