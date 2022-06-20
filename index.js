@@ -7,6 +7,7 @@ const index = new Telegraf('5333642362:AAHWgFsRXBTFyfnHj6vvZFXJTY8mTt4AwBo')
 
 
 const SceneGenerator = require('./src/scene')
+const mongodb = require("./db");
 const curScene = new SceneGenerator()
 
 
@@ -18,6 +19,9 @@ index.use(stage.middleware())
 index.start(async (ctx) => {
   await ctx.scene.enter('text')
 })
+
+
+
 
 index.launch().then()
 

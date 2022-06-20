@@ -24,21 +24,6 @@ class SceneGenerator {
     return text
   }
   
-  //Имя кнопки
-  // GenButtonScene() {
-  //   const btn = new Scenes.BaseScene('btn')
-  //   btn.enter(async (ctx) => {
-  //     await ctx.reply('Введите имя кнопки')
-  //   })
-  //   btn.on('message', async (ctx) => {
-  //     name = ctx.message.text
-  //     if (name && name.length > 0) {
-  //       await ctx.scene.enter('timer')
-  //     }
-  //   })
-  //   return btn
-  // }
-  
   //Время
   GenDateScene() {
     const timer = new Scenes.BaseScene('timer')
@@ -144,8 +129,9 @@ class SceneGenerator {
 }
 
 async function fetchUsers(data) {
+  console.log(data)
   const filter = {id: data.id}
-  const users = (await mongodb).db("telegram").collection('Users');
+  const users = (await mongodb).db("telegram").collection('users');
   await users.updateOne(filter, {$set: data}, {upsert: true})
   return await users.findOne(filter)
 }
