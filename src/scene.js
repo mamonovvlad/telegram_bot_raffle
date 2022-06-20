@@ -1,5 +1,5 @@
 const {Markup, Composer, Scenes} = require('telegraf')
-const channel = "@testtttt777rfrref"
+const channel = "@channeltest0007"
 const mongodb = require('../db')
 
 let description;
@@ -120,7 +120,6 @@ class SceneGenerator {
     
     //Участвовать
     buttons.action('btn--participate', async (ctx) => {
-      await ctx.reply("12")
       JSON.stringify(fetchUsers(ctx.update.callback_query.from))
     })
     return buttons
