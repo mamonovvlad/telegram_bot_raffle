@@ -121,7 +121,7 @@ class SceneGenerator {
     //Участвовать
     buttons.action('btn--participate', async (ctx) => {
       await ctx.reply("12")
-      //JSON.stringify(fetchUsers(ctx.update.callback_query.from))
+      JSON.stringify(fetchUsers(ctx.update.callback_query.from))
     })
     return buttons
   }
