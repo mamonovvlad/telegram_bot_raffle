@@ -33,8 +33,6 @@ class SceneGenerator {
     timer.on('text', async (ctx) => {
       dateText = ctx.message.text;
       if (Date.parse(dateText) && dateText.length === 19) {
-        
-        
         await ctx.scene.enter('buttons')
       } else {
         ctx.reply('Ошибка')
@@ -71,7 +69,7 @@ class SceneGenerator {
       let res = await ctx.telegram.sendMessage(channel, description,
         Markup.inlineKeyboard([
           [
-            Markup.button.callback(`Участвовать(${+1})`, 'btn--participate',)
+            Markup.button.callback(`Участвовать`, 'btn--participate',)
           ]
         ]))
       
@@ -80,9 +78,14 @@ class SceneGenerator {
         message_id: res.message_id
       }
       
+      ctx.getChatMenuButton({channel}, async (ctx) => {
+        await console.log(ctx)
+      })
+      
       setTimeout(() => {
         ctx.editMessageText(`${description}\n\nПобедитель(-и): @MamonovVlad`, opts)
       }, sec)
+      
       
     })
     
@@ -100,7 +103,7 @@ class SceneGenerator {
       }
     })
     
-    //Предпросмотр
+    //Отменить
     buttons.action('btn--cansel', async (ctx) => {
       try {
         ctx.reply('Бот остановлен')
@@ -117,22 +120,29 @@ class SceneGenerator {
         console.error(e)
       }
     })
-    
-    //Участвовать
-    buttons.action('btn--participate', async (ctx) => {
-      JSON.stringify(fetchUsers(ctx.update.callback_query.from))
-    })
+  
+    buttons.callbackQuery('exfc')
+    // buttons.on('callback_query', async (ctx) => {
+    //   // Участвовать
+    //   buttons.action('btn--participate', async (ctx) => {
+    //     await console.log(ctx.update.callback_query.from)
+    //     buttons.answerCallbackQuery('Вы выбрали: ')
+    //     // await JSON.stringify(fetchUsers(ctx.update.callback_query.from))
+    //   })
+    // })
     return buttons
   }
   
 }
 
-async function fetchUsers(data) {
-  console.log(data)
-  const filter = {id: data.id}
-  const users = (await mongodb).db("telegram").collection('users');
-  await users.updateOne(filter, {$set: data}, {upsert: true})
-  return await users.findOne(filter)
-}
+
+
+// async function fetchUsers(data) {
+//   console.log(data)
+//   const filter = {id: data.id}
+//   const users = (await mongodb).db("telegram").collection('users');
+//   await users.updateOne(filter, {$set: data}, {upsert: true})
+//   return await users.findOne(filter)
+// }
 
 module.exports = SceneGenerator
