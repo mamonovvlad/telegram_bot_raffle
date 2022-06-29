@@ -18,7 +18,7 @@ PASSWORD:
 DATABASE:
 ```
 
-Run server
+Run locally server 
 
 ```bash
 npm run dev
