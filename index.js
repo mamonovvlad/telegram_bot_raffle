@@ -47,6 +47,7 @@ bot.action('btn--publish', async (ctx) => {
           Markup.button.callback(`Участвую!`, 'btn--participate',)
         ]
       ]))
+    
     determineWinner(ctx, res)
     console.log('Опубликовать')
   } else {
@@ -81,7 +82,9 @@ const determineWinner = (ctx, res) => {
     chat_id: channel,
     message_id: res.message_id
   }
-  
+  console.log('Определить победитель')
+  console.log(timeFor, now, sec)
+  console.log(opts)
   setTimeout(() => {
     //Запуск рандома
     console.log('Запуск рандома')
