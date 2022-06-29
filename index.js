@@ -1,6 +1,8 @@
 const {Scenes, session, Telegraf, Markup} = require('telegraf')
 const channel = '@channeltest0007'
 require('dotenv').config();
+let i = 0
+let winner
 // const bot = new Telegraf(process.env.TOKEN)
 const bot = new Telegraf('5333642362:AAHWgFsRXBTFyfnHj6vvZFXJTY8mTt4AwBo')
 
@@ -63,9 +65,17 @@ bot.action('btn--participate', async (ctx) => {
     if (err) {
       // console.log(err, 'fetchUsers')
     }
-    console.log('Участвовать')
+    console.log(result, 'Участвовать')
     if (result !== undefined) {
       ctx.answerCbQuery('Вы участвуете 💸')
+      ctx.editMessageText(`${curScene.GenTextScene().description}`, Markup.inlineKeyboard([
+        [
+          Markup.button.callback(`Участвую! (${i += 1})`, 'btn--participate',)
+        ]
+      ]), {
+        chat_id: channel,
+        message_id: ctx.update.callback_query.message.message_id
+      })
     } else {
       ctx.answerCbQuery('Вы уже участвуете в розыгрыше')
     }
@@ -84,7 +94,7 @@ const determineWinner = (ctx, res) => {
   }
   console.log('Определить победитель')
   console.log(timeFor, now, sec)
-  console.log(opts)
+  console.log()
   setTimeout(() => {
     //Запуск рандома
     console.log('Запуск рандома')
@@ -95,7 +105,6 @@ const determineWinner = (ctx, res) => {
 //Запустить  рандом
 const runRandomizer = (ctx, opts, callback) => {
   const participants = [];
-  let winner;
   const query = "SELECT * FROM user"
   conn.query(query, (err, result, field) => {
     if (err) {
