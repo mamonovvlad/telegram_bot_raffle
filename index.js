@@ -25,7 +25,7 @@ conn.connect(err => {
   if (err) {
     console.log(err)
   }
-  console.log('connect ---------------------------------------------------')
+  console.log('Connect!')
 })
 
 bot.use(session())
@@ -48,6 +48,7 @@ bot.action('btn--publish', async (ctx) => {
         ]
       ]))
     determineWinner(ctx, res)
+    console.log('Опубликовать')
   } else {
     ctx.reply('Текст не заполнен, запустите бота заново 🧐')
   }
@@ -61,6 +62,7 @@ bot.action('btn--participate', async (ctx) => {
     if (err) {
       // console.log(err, 'fetchUsers')
     }
+    console.log('Участвовать')
     if (result !== undefined) {
       ctx.answerCbQuery('Вы участвуете 💸')
     } else {
@@ -82,6 +84,7 @@ const determineWinner = (ctx, res) => {
   
   setTimeout(() => {
     //Запуск рандома
+    console.log('Запуск рандома')
     runRandomizer(ctx, opts, drorDatabase)
   }, sec)
 }
@@ -95,12 +98,11 @@ const runRandomizer = (ctx, opts, callback) => {
     if (err) {
       console.log(err)
     }
-    console.log(result, 'runRandomizer')
+    console.log(result, 'Старт Рандома')
     //Перебираю users
     result.forEach(item => {
       participants.push(item.username);
     })
-    
     
     //Выбираю победителя
     winner = participants[Math.floor(Math.random() * participants.length)]
@@ -111,11 +113,13 @@ const runRandomizer = (ctx, opts, callback) => {
 
 const drorDatabase = () => {
   //Callback на очищения базы
+  
   const query = 'DELETE FROM user'
   conn.query(query, (err, result, field) => {
     if (err) {
       console.log(err)
     }
+    console.log(result, 'Callback на очищения базы')
     if (result) {
       conn.end(err => {
         if (err) {
