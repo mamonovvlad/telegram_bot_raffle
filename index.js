@@ -3,8 +3,8 @@ const channel = '@channeltest0007'
 require('dotenv').config();
 let i = 0
 let winner
-// const bot = new Telegraf(process.env.TOKEN)
-const bot = new Telegraf('5333642362:AAHWgFsRXBTFyfnHj6vvZFXJTY8mTt4AwBo')
+
+const bot = new Telegraf(process.env.TOKEN)
 
 //Scene
 const SceneGenerator = require('./src/scene')
@@ -16,10 +16,10 @@ const mysql = require('mysql')
 
 
 const conn = mysql.createConnection({
-  host: '188.166.40.146',
-  user: 'vlad',
-  password: 'paSsrt45gbfht44eddss17yrgfghjj2ertew',
-  database: 'pool'
+  host: process.env.HOST,
+  user: process.env.USER,
+  password: process.env.PASSWORD,
+  database: process.env.DATABASE
 })
 
 
