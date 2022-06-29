@@ -12,6 +12,7 @@ const stage = new Scenes.Stage([curScene.GenTextScene().text, curScene.GenDateSc
 //Database
 const mysql = require('mysql')
 
+
 const conn = mysql.createConnection({
   host: '188.166.40.146',
   user: 'vlad',
@@ -81,24 +82,7 @@ const determineWinner = (ctx, res) => {
   
   setTimeout(() => {
     //Запуск рандома
-    runRandomizer(ctx, opts, () => {
-      //Callback на очищения базы
-      const query = 'DELETE FROM user'
-      conn.query(query, (err, result, field) => {
-        if (err) {
-          console.log(err)
-        }
-        if (result) {
-          conn.end(err => {
-            if (err) {
-              console.log(err)
-            } else {
-              console.log('disconnected')
-            }
-          })
-        }
-      })
-    })
+    runRandomizer(ctx, opts, drorDatabase)
   }, sec)
 }
 
@@ -122,7 +106,27 @@ const runRandomizer = (ctx, opts, callback) => {
     winner = participants[Math.floor(Math.random() * participants.length)]
     ctx.editMessageText(`${curScene.GenTextScene().description}\nПобедитель(-и): ${winner !== undefined ? winner : "Извените произошла ошибка"}`, opts)
   })
-  return callback()
+  callback()
+}
+
+const drorDatabase = () => {
+  //Callback на очищения базы
+  const query = 'DELETE FROM user'
+  conn.query(query, (err, result, field) => {
+    if (err) {
+      console.log(err)
+    }
+    if (result) {
+      conn.end(err => {
+        if (err) {
+          console.log(err)
+        } else {
+          console.log('disconnected')
+        }
+      })
+    }
+  })
+  
 }
 
 bot.launch().then()
