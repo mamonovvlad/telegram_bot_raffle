@@ -4,7 +4,7 @@ require('dotenv').config();
 let i = 0
 let winner
 
-const bot = new Telegraf(process.env.TOKEN)
+const bot = new Telegraf(process.env.TELEGRAM_TOKEN)
 
 //Scene
 const SceneGenerator = require('./src/scene')
@@ -16,17 +16,18 @@ const mysql = require('mysql2')
 
 
 const conn = mysql.createConnection({
-  host: process.env.HOST,
-  user: process.env.USER,
-  password: process.env.PASSWORD,
-  database: process.env.DATABASE
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE
 })
 
 console.log(
-  "host:", process.env.HOST,';',
-  "user:", process.env.USER,';',
-  "password:", process.env.PASSWORD,';',
-  "database:", process.env.DATABASE
+  "token:", process.env.TELEGRAM_TOKEN,';',
+  "host:", process.env.DB_HOST,';',
+  "user:", process.env.DB_USER,';',
+  "password:", process.env.DB_PASSWORD,';',
+  "database:", process.env.DB_DATABASE
 )
 
 conn.connect(err => {
