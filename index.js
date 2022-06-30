@@ -12,7 +12,7 @@ const curScene = new SceneGenerator()
 const stage = new Scenes.Stage([curScene.GenTextScene().text, curScene.GenDateScene().timer, curScene.GenPublishScene()])
 
 //Database
-const mysql = require('mysql')
+const mysql = require('mysql2')
 
 
 const conn = mysql.createConnection({
@@ -94,7 +94,7 @@ const determineWinner = (ctx, res) => {
   }
   console.log('Определить победитель')
   console.log(timeFor, now, sec)
-  console.log()
+  
   setTimeout(() => {
     //Запуск рандома
     console.log('Запуск рандома')
@@ -112,20 +112,24 @@ const runRandomizer = (ctx, opts, callback) => {
     }
     console.log(result, 'Старт Рандома')
     //Перебираю users
-    result.forEach(item => {
-      participants.push(item.username);
-    })
+    if (result) {
+      result.forEach(item => {
+        participants.push(item.username);
+      })
+    } else {
+      participants.push('Победитель не определен')
+    }
+    
     
     //Выбираю победителя
     winner = participants[Math.floor(Math.random() * participants.length)]
-    ctx.editMessageText(`${curScene.GenTextScene().description}\nПобедитель(-и): ${winner !== undefined ? winner : "Извените произошла ошибка"}`, opts)
+    ctx.editMessageText(`${curScene.GenTextScene().description}\n\nПобедитель: ${winner !== undefined ? winner : "Извените произошла ошибка"}`, opts)
   })
   callback()
 }
 
 const drorDatabase = () => {
   //Callback на очищения базы
-  
   const query = 'DELETE FROM user'
   conn.query(query, (err, result, field) => {
     if (err) {
