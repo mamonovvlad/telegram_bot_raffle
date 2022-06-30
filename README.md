@@ -27,5 +27,5 @@ npm run dev
 ### Run server
 
 ```bash
-node index.js (npm start)
+node index.js (npm run start)
 ```
