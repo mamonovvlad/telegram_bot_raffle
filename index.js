@@ -22,14 +22,6 @@ const conn = mysql.createConnection({
   database: process.env.DB_DATABASE
 })
 
-console.log(
-  "token:", process.env.TELEGRAM_TOKEN,';',
-  "host:", process.env.DB_HOST,';',
-  "user:", process.env.DB_USER,';',
-  "password:", process.env.DB_PASSWORD,';',
-  "database:", process.env.DB_DATABASE
-)
-
 conn.connect(err => {
   if (err) {
     console.log(err)
@@ -58,7 +50,6 @@ bot.action('btn--publish', async (ctx) => {
       ]))
     
     determineWinner(ctx, res)
-    console.log('Опубликовать')
   } else {
     ctx.reply('Текст не заполнен, запустите бота заново 🧐')
   }
@@ -66,27 +57,27 @@ bot.action('btn--publish', async (ctx) => {
 
 //Участвовать
 bot.action('btn--participate', async (ctx) => {
-  const query = `INSERT INTO user (username, user_id)
-                 VALUES ('${ctx.update.callback_query.from.username}', '${ctx.update.callback_query.from.id}')`;
-  conn.query(query, (err, result, field) => {
-    if (err) {
-      // console.log(err, 'fetchUsers')
-    }
-    console.log(result, 'Участвовать')
-    if (result !== undefined) {
-      ctx.answerCbQuery('Вы участвуете 💸')
-      ctx.editMessageText(`${curScene.GenTextScene().description}`, Markup.inlineKeyboard([
-        [
-          Markup.button.callback(`Участвую! (${i += 1})`, 'btn--participate',)
-        ]
-      ]), {
-        chat_id: channel,
-        message_id: ctx.update.callback_query.message.message_id
-      })
-    } else {
-      ctx.answerCbQuery('Вы уже участвуете в розыгрыше')
-    }
-  })
+  if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left') {
+    const query = `INSERT INTO user (username, user_id)
+                   VALUES ('${ctx.update.callback_query.from.username}', '${ctx.update.callback_query.from.id}')`;
+    conn.query(query, (err, result, field) => {
+      if (result !== undefined) {
+        ctx.answerCbQuery('Вы участвуете 💸')
+        ctx.editMessageText(`${curScene.GenTextScene().description}`, Markup.inlineKeyboard([
+          [
+            Markup.button.callback(`Участвую! (${i += 1})`, 'btn--participate',)
+          ]
+        ]), {
+          chat_id: channel,
+          message_id: ctx.update.callback_query.message.message_id
+        })
+      } else {
+        ctx.answerCbQuery('Вы уже участвуете в розыгрыше')
+      }
+    })
+  } else {
+    ctx.answerCbQuery('Чтобы принять участие, вы должны быть подписчиком канала')
+  }
 })
 
 //Func
@@ -99,12 +90,8 @@ const determineWinner = (ctx, res) => {
     chat_id: channel,
     message_id: res.message_id
   }
-  console.log('Определить победитель')
-  console.log(timeFor, now, sec)
-  
   setTimeout(() => {
     //Запуск рандома
-    console.log('Запуск рандома')
     runRandomizer(ctx, opts, drorDatabase)
   }, sec)
 }
@@ -117,7 +104,6 @@ const runRandomizer = (ctx, opts, callback) => {
     if (err) {
       console.log(err)
     }
-    console.log(result, 'Старт Рандома')
     //Перебираю users
     if (result) {
       result.forEach(item => {
@@ -126,7 +112,6 @@ const runRandomizer = (ctx, opts, callback) => {
     } else {
       participants.push('Победитель не определен')
     }
-    
     
     //Выбираю победителя
     winner = participants[Math.floor(Math.random() * participants.length)]
@@ -142,7 +127,6 @@ const drorDatabase = () => {
     if (err) {
       console.log(err)
     }
-    console.log(result, 'Callback на очищения базы')
     if (result) {
       conn.end(err => {
         if (err) {
