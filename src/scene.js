@@ -24,7 +24,7 @@ class SceneGenerator {
   GenDateScene() {
     const timer = new Scenes.BaseScene('timer')
     timer.enter(async (ctx) => {
-      await ctx.reply("Введите дату в формате ⏰\n09/24/2022 09:25:32")
+      await ctx.reply("Введите дату в формате ⏰\nВыстовлять время по Киеву\n12/31/2000 10:00:00")
     })
     timer.on('text', async (ctx) => {
       dateChange = ctx.message.text;
