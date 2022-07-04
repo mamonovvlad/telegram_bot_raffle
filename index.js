@@ -63,6 +63,7 @@ bot.action('btn--participate', async (ctx) => {
     
     conn.query(query, (err, result, field) => {
       if (messageId === ctx.update.callback_query.message.message_id) {
+        console.log(result)
         if (result !== undefined) {
           ctx.answerCbQuery('Вы участвуете 💸')
           ctx.editMessageText(`${curScene.GenTextScene().description}`, Markup.inlineKeyboard([
