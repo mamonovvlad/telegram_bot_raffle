@@ -2,6 +2,7 @@ const {Scenes, session, Telegraf, Markup} = require('telegraf')
 const channel = '@channeltest0007'
 require('dotenv').config();
 let i = 0
+let messageId;
 
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN)
 
@@ -47,7 +48,7 @@ bot.action('btn--publish', async (ctx) => {
           Markup.button.callback(`Участвую!`, 'btn--participate',)
         ]
       ]))
-    
+    messageId = res.message_id
     determineWinner(ctx, res)
   } else {
     ctx.reply('Текст не заполнен, запустите бота заново 🧐')
@@ -61,20 +62,22 @@ bot.action('btn--participate', async (ctx) => {
                    VALUES ('${ctx.update.callback_query.from.username}', '${ctx.update.callback_query.from.id}')`;
     
     conn.query(query, (err, result, field) => {
-      
-      console.log(result)
-      if (result !== undefined) {
-        ctx.answerCbQuery('Вы участвуете 💸')
-        ctx.editMessageText(`${curScene.GenTextScene().description}`, Markup.inlineKeyboard([
-          [
-            Markup.button.callback(`Участвую! (${i += 1})`, 'btn--participate',)
-          ]
-        ]), {
-          chat_id: channel,
-          message_id: ctx.update.callback_query.message.message_id
-        })
+      if (messageId === ctx.update.callback_query.message.message_id) {
+        if (result !== undefined) {
+          ctx.answerCbQuery('Вы участвуете 💸')
+          ctx.editMessageText(`${curScene.GenTextScene().description}`, Markup.inlineKeyboard([
+            [
+              Markup.button.callback(`Участвую! (${i += 1})`, 'btn--participate',)
+            ]
+          ]), {
+            chat_id: channel,
+            message_id: ctx.update.callback_query.message.message_id
+          })
+        } else {
+          ctx.answerCbQuery('Вы уже участвуете в розыгрыше')
+        }
       } else {
-        ctx.answerCbQuery('Вы уже участвуете в розыгрыше')
+        ctx.answerCbQuery('Этот розыгрыше не актуален')
       }
     })
   } else {
@@ -112,9 +115,9 @@ const runRandomizer = (ctx, opts, callback) => {
     } else {
       participants.push('Победитель не определен')
     }
- 
+    
     //Выбираю победителя
-   let winner = participants[Math.floor(Math.random() * participants.length)]
+    let winner = participants[Math.floor(Math.random() * participants.length)]
     console.log(winner)
     ctx.editMessageText(`${curScene.GenTextScene().description}\n\nПобедитель: ${winner !== undefined ? winner : "Извините произошла ошибка"}`, opts)
   })
