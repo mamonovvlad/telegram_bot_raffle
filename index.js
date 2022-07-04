@@ -2,7 +2,6 @@ const {Scenes, session, Telegraf, Markup} = require('telegraf')
 const channel = '@channeltest0007'
 require('dotenv').config();
 let i = 0
-let winner
 
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN)
 
@@ -98,13 +97,14 @@ const determineWinner = (ctx, res) => {
 
 //Запустить  рандом
 const runRandomizer = (ctx, opts, callback) => {
-  const participants = [];
+  const participants = []
   const query = "SELECT * FROM user"
   conn.query(query, (err, result, field) => {
     if (err) {
       console.log(err)
     }
     //Перебираю users
+    console.log(result)
     if (result) {
       result.forEach(item => {
         participants.push(item.username);
@@ -112,10 +112,11 @@ const runRandomizer = (ctx, opts, callback) => {
     } else {
       participants.push('Победитель не определен')
     }
-    
+ 
     //Выбираю победителя
-    winner = participants[Math.floor(Math.random() * participants.length)]
-    ctx.editMessageText(`${curScene.GenTextScene().description}\n\nПобедитель: ${winner !== undefined ? winner : "Извените произошла ошибка"}`, opts)
+   let winner = participants[Math.floor(Math.random() * participants.length)]
+    console.log(winner)
+    ctx.editMessageText(`${curScene.GenTextScene().description}\n\nПобедитель: ${winner !== undefined ? winner : "Извините произошла ошибка"}`, opts)
   })
   callback()
 }
@@ -137,7 +138,6 @@ const drorDatabase = () => {
       })
     }
   })
-  
 }
 
 bot.launch().then()
