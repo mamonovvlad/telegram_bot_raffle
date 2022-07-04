@@ -59,7 +59,10 @@ bot.action('btn--participate', async (ctx) => {
   if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left') {
     const query = `INSERT INTO user (username, user_id)
                    VALUES ('${ctx.update.callback_query.from.username}', '${ctx.update.callback_query.from.id}')`;
+    
     conn.query(query, (err, result, field) => {
+      
+      console.log(result)
       if (result !== undefined) {
         ctx.answerCbQuery('Вы участвуете 💸')
         ctx.editMessageText(`${curScene.GenTextScene().description}`, Markup.inlineKeyboard([
@@ -100,9 +103,6 @@ const runRandomizer = (ctx, opts, callback) => {
   const participants = []
   const query = "SELECT * FROM user"
   conn.query(query, (err, result, field) => {
-    if (err) {
-      console.log(err)
-    }
     //Перебираю users
     console.log(result)
     if (result) {
@@ -125,9 +125,6 @@ const drorDatabase = () => {
   //Callback на очищения базы
   const query = 'DELETE FROM user'
   conn.query(query, (err, result, field) => {
-    if (err) {
-      console.log(err)
-    }
     if (result) {
       conn.end(err => {
         if (err) {
