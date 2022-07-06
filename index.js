@@ -22,12 +22,8 @@ const conn = mysql.createConnection({
   database: process.env.DB_DATABASE
 })
 
-conn.connect(err => {
-  if (err) {
-    console.log(err)
-  }
-  console.log('Connect!')
-})
+
+console.log('Start Bot!')
 
 bot.use(session())
 bot.use(stage.middleware())
@@ -98,31 +94,37 @@ const determineWinner = (ctx, res) => {
   }
   setTimeout(() => {
     //Запуск рандома
-    runRandomizer(ctx, opts, drorDatabase)
+    getUsers(ctx, opts)
   }, sec)
 }
 
-//Запустить  рандом
-const runRandomizer = (ctx, opts, callback) => {
-  const participants = []
+function getUsers(ctx, opts) {
   const query = "SELECT * FROM user"
+  let res = []
   conn.query(query, (err, result, field) => {
-    //Перебираю users
-    console.log(result)
-    if (result) {
-      result.forEach(item => {
-        participants.push(item.username);
-      })
-    } else {
-      participants.push('Победитель не определен')
+    if (err) {
+      console.log(err)
     }
-    
-    //Выбираю победителя
-    let winner = participants[Math.floor(Math.random() * participants.length)]
-    console.log(winner)
-    ctx.editMessageText(`${curScene.GenTextScene().description}\n\nПобедитель: ${winner !== undefined ? winner : "Извините произошла ошибка"}`, opts)
+    console.log(result)
+    result.forEach(item => {
+      res.push(item.username)
+    })
+    return runRandomizer(ctx, opts, res)
   })
-  callback()
+  
+}
+
+//Запустить  рандом
+const runRandomizer = (ctx, opts, res) => {
+  let winner
+  //Выбираю победителя
+  if (typeof res !== undefined && res.length > 0) {
+    winner = res[Math.floor(Math.random() * res.length)]
+  } else {
+    winner = 'Победитель не определен'
+  }
+  ctx.editMessageText(`${curScene.GenTextScene().description}\n\nПобедитель: ${winner !== undefined ? winner : "Извините произошла ошибка"}`, opts)
+  drorDatabase()
 }
 
 const drorDatabase = () => {
