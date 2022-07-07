@@ -14,16 +14,15 @@ const stage = new Scenes.Stage([curScene.GenTextScene().text, curScene.GenDateSc
 //Database
 const mysql = require('mysql2')
 
-
-const conn = mysql.createConnection({
+let config = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE
-})
+}
+let conn = mysql.createConnection(config)
 
-
-console.log('Start Bot!')
+checkConnection()
 
 bot.use(session())
 bot.use(stage.middleware())
@@ -54,6 +53,7 @@ bot.action('btn--publish', async (ctx) => {
 //Участвовать
 bot.action('btn--participate', async (ctx) => {
   if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left') {
+    checkConnection()
     const query = `INSERT INTO user (username, user_id)
                    VALUES ('${ctx.update.callback_query.from.username}', '${ctx.update.callback_query.from.id}')`;
     
@@ -99,6 +99,7 @@ const determineWinner = (ctx, res) => {
 }
 
 function getUsers(ctx, opts) {
+  checkConnection()
   const query = "SELECT * FROM user"
   let res = []
   conn.query(query, (err, result, field) => {
@@ -140,6 +141,15 @@ const drorDatabase = () => {
         }
       })
     }
+  })
+}
+
+function checkConnection() {
+  conn.connect(err => {
+    if (err) {
+      conn = mysql.createConnection(config)
+    }
+    console.log("Connection")
   })
 }
 
