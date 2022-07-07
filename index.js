@@ -1,9 +1,8 @@
 const {Scenes, session, Telegraf, Markup} = require('telegraf')
-const channel = '@channeltest0007'
 require('dotenv').config();
 let i = 0
 let messageId;
-
+const channel = process.env.TELEGRAM_CHANNEL
 const bot = new Telegraf(process.env.TELEGRAM_TOKEN)
 
 //Scene
