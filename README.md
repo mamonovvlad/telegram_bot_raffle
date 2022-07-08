@@ -11,11 +11,12 @@ npm install
 Create file .env
 
 ```bash
-TOKEN: 
-HOST:
-USER:
-PASSWORD:
-DATABASE:
+TELEGRAM_TOKEN:
+TELEGRAM_CHANNEL:
+DB_HOST:
+DB_USER:
+DB_PASSWORD:
+DB_DATABASE:
 ```
 
 Run locally server 

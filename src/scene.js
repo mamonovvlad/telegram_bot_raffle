@@ -1,5 +1,4 @@
 const {Markup, Scenes} = require('telegraf')
-
 let dateChange;
 let description;
 
@@ -33,7 +32,9 @@ class SceneGenerator {
       } else {
         ctx.reply('Ошибка')
       }
+      
     })
+    
     return {timer, dateChange}
   }
   
