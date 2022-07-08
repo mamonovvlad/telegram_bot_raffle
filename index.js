@@ -51,6 +51,7 @@ bot.action('btn--publish', async (ctx) => {
             if (err) {
               console.log(err)
             }
+            console.log(result)
             if (result.length > 0 && typeof result !== undefined) {
               const updateDate = `UPDATE info_chat
                                   SET date       = '${curScene.GenDateScene().dateChange}',
@@ -195,13 +196,13 @@ const drorDatabase = () => {
   const query = 'DELETE FROM user'
   conn.query(query, (err, result, field) => {
     if (result) {
-      conn.end(err => {
-        if (err) {
-          console.log(err)
-        } else {
-          console.log('disconnected')
-        }
-      })
+      // conn.end(err => {
+      //   if (err) {
+      //     console.log(err)
+      //   } else {
+      //     console.log('disconnected')
+      //   }
+      // })
     }
   })
 }
