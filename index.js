@@ -31,57 +31,6 @@ bot.start(async (ctx) => {
 })
 
 //Buttons
-//Опубликовать
-bot.action('btn--publish', async (ctx) => {
-    if (curScene.GenTextScene().description !== undefined) {
-      ctx.reply('Готово')
-      let res = await ctx.telegram.sendMessage(channel, curScene.GenTextScene().description,
-        Markup.inlineKeyboard([
-          [
-            Markup.button.callback(`Участвую!`, 'btn--participate',)
-          ]
-        ]))
-      conn.connect(err => {
-          if (err) {
-            conn = mysql.createConnection(config)
-          }
-          let infoChat = `SELECT *
-                          FROM info_chat`
-          conn.query(infoChat, (err, result) => {
-            if (err) {
-              console.log(err)
-            }
-            console.log(result)
-            if (result.length > 0 && typeof result !== undefined) {
-              const updateDate = `UPDATE info_chat
-                                  SET date       = '${curScene.GenDateScene().dateChange}',
-                                      message_id = '${res.message_id}'`;
-              conn.query(updateDate, (err, result) => {
-                if (err) {
-                  console.log(err)
-                }
-                determineWinner(ctx, res)
-              })
-            } else {
-              const saveData = `INSERT INTO info_chat (date, message_id)
-                                VALUES ('${curScene.GenDateScene().dateChange}', '${res.message_id}')`;
-              conn.query(saveData, (err, result) => {
-                if (err) {
-                  console.log(err)
-                }
-                determineWinner(ctx, res)
-              })
-            }
-            
-          })
-        }
-      )
-    } else {
-      ctx.reply('Текст не заполнен, запустите бота заново 🧐')
-    }
-  }
-)
-
 //Участвовать
 bot.action('btn--participate', async (ctx) => {
   if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left') {
@@ -97,9 +46,6 @@ bot.action('btn--participate', async (ctx) => {
         const getMessage = `SELECT *
                             FROM info_chat`
         conn.query(getMessage, (err, resultMessage) => {
-          if (err) {
-            console.log(err)
-          }
           resultMessage.forEach(item => {
             if (item.message_id === ctx.update.callback_query.message.message_id) {
               if (resultUsers !== undefined) {
@@ -128,19 +74,57 @@ bot.action('btn--participate', async (ctx) => {
   
 })
 
+//Опубликовать
+bot.action('btn--publish', async (ctx) => {
+    if (curScene.GenTextScene().description !== undefined) {
+      ctx.reply('Готово')
+      let res = await ctx.telegram.sendMessage(channel, curScene.GenTextScene().description,
+        Markup.inlineKeyboard([
+          [
+            Markup.button.callback(`Участвую!`, 'btn--participate',)
+          ]
+        ]))
+      conn.connect(err => {
+          if (err) {
+            conn = mysql.createConnection(config)
+          }
+          let infoChat = `SELECT *
+                          FROM info_chat`
+          conn.query(infoChat, (err, result) => {
+            if (result.length > 0 && typeof result !== undefined) {
+              const updateDate = `UPDATE info_chat
+                                  SET date       = '${curScene.GenDateScene().dateChange}',
+                                      message_id = '${res.message_id}'`;
+              conn.query(updateDate, (err, result) => {
+                determineWinner(ctx)
+              })
+            } else {
+              const saveData = `INSERT INTO info_chat (date, message_id)
+                                VALUES ('${curScene.GenDateScene().dateChange}', '${res.message_id}')`;
+              conn.query(saveData, (err, result) => {
+                determineWinner(ctx)
+              })
+            }
+            
+          })
+        }
+      )
+    } else {
+      ctx.reply('Текст не заполнен, запустите бота заново 🧐')
+    }
+  }
+)
 
 //Func
 //Определить победитель
-const determineWinner = (ctx, res) => {
+const determineWinner = (ctx) => {
   conn.connect(err => {
     if (err) {
       conn = mysql.createConnection(config)
     }
+    
     const query = "SELECT * FROM info_chat"
     conn.query(query, (err, result) => {
-      if (err) {
-        console.log(err)
-      }
       result.forEach(item => {
         let drawDate = new Date(item.date)
         let opts = {
@@ -149,15 +133,18 @@ const determineWinner = (ctx, res) => {
         }
         schedule.scheduleJob(drawDate, () => {
           console.log('Запуск рандома')
-          getUsers(ctx, opts)
+          runRandomizer(ctx, opts)
         })
       })
+      
+      
     })
   })
-  
 }
 
-function getUsers(ctx, opts) {
+//Запустить  рандом
+const runRandomizer = (ctx, opts) => {
+  let winner
   conn.connect(err => {
     if (err) {
       conn = mysql.createConnection(config)
@@ -165,44 +152,29 @@ function getUsers(ctx, opts) {
     const query = "SELECT * FROM user"
     let res = []
     conn.query(query, (err, result, field) => {
-      if (err) {
-        console.log(err)
-      }
       result.forEach(item => {
         res.push(item.username)
       })
-      return runRandomizer(ctx, opts, res)
+      //Выбираю победителя
+      if (typeof res !== undefined && res.length > 0) {
+        winner = res[Math.floor(Math.random() * res.length)]
+      } else {
+        winner = 'Победитель не определен'
+      }
+      ctx.editMessageText(`${curScene.GenTextScene().description}\n\nПобедитель: ${winner !== undefined ? winner : "Извините произошла ошибка"}`, opts)
+      drorDatabase()
     })
   })
   
   
 }
 
-//Запустить  рандом
-const runRandomizer = (ctx, opts, res) => {
-  let winner
-  //Выбираю победителя
-  if (typeof res !== undefined && res.length > 0) {
-    winner = res[Math.floor(Math.random() * res.length)]
-  } else {
-    winner = 'Победитель не определен'
-  }
-  ctx.editMessageText(`${curScene.GenTextScene().description}\n\nПобедитель: ${winner !== undefined ? winner : "Извините произошла ошибка"}`, opts)
-  drorDatabase()
-}
-
 const drorDatabase = () => {
   //Callback на очищения базы
   const query = 'DELETE FROM user'
   conn.query(query, (err, result, field) => {
-    if (result) {
-      // conn.end(err => {
-      //   if (err) {
-      //     console.log(err)
-      //   } else {
-      //     console.log('disconnected')
-      //   }
-      // })
+    if (err) {
+      console.log(err, 'drorDatabase')
     }
   })
 }
