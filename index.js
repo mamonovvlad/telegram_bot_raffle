@@ -20,7 +20,7 @@ let config = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE
 }
-let conn = mysql.createConnection(config)
+let conn = mysql.createPool(config)
 
 bot.use(session())
 bot.use(stage.middleware())
@@ -124,8 +124,6 @@ async function determineWinner(ctx) {
         runRandomizer(ctx, opts)
       })
     })
-    
-    
   })
 }
 
