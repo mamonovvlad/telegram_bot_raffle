@@ -17,9 +17,9 @@ let config = {
 }
 let conn = mysql.createConnection(config)
 
-
 bot.use(session())
 bot.use(stage.middleware())
+
 bot.start(async (ctx) => {
   await ctx.scene.enter('text')
 })
@@ -41,7 +41,33 @@ bot.action('btn--participate', async (ctx) => {
             resultMessage.forEach(item => {
               if (item.message_id === ctx.update.callback_query.message.message_id) {
                 if (resultUsers !== undefined) {
+                  const getUsers = `SELECT *
+                                    FROM user`
+                  checkingConn().then(err => {
+                    conn.query(getUsers, (err, result) => {
+                      ctx.editMessageText(`${item.description}`, Markup.inlineKeyboard([
+                        [
+                          Markup.button.callback(`Участвую! (${result.length})`, 'btn--participate',)
+                        ]
+                      ]), {
+                        chat_id: channel,
+                        message_id: ctx.update.callback_query.message.message_id
+                      })
+                      
+                      
+                    })
+                  })
                   ctx.answerCbQuery('Вы участвуете 💸')
+                  
+                  
+                  // ctx.editMessageText(`${curScene.GenTextScene().description}`, Markup.inlineKeyboard([
+                  //   [
+                  //     Markup.button.callback(`Участвую! (${i += 1})`, 'btn--participate',)
+                  //   ]
+                  // ]), {
+                  //   chat_id: channel,
+                  //   message_id: ctx.update.callback_query.message.message_id
+                  // })
                 } else {
                   ctx.answerCbQuery('Вы уже участвуете в розыгрыше')
                 }
@@ -75,27 +101,28 @@ bot.action('btn--publish', async (ctx) => {
                     FROM info_chat`
     checkingConn().then(err => {
       conn.query(infoChat, async (err, result) => {
-        if (result.length > 0 && typeof result !== undefined) {
+        if (typeof result !== undefined && result != null && result.length != null && result.length > 0) {
           const updateDate = `UPDATE info_chat
-                              SET date       = '${curScene.GenDateScene().dateChange}',
-                                  message_id = '${res.message_id}'`;
+                              SET date        = '${curScene.GenDateScene().dateChange}',
+                                  message_id  = '${res.message_id}',
+                                  description = '${curScene.GenTextScene().description}'`;
           checkingConn().then(err => {
-            conn.query(updateDate, async (err, result) => {
-              await determineWinner(ctx)
+            conn.query(updateDate, (err, result) => {
+              determineWinner(ctx)
             })
             conn.end();
           })
         } else {
-          const saveData = `INSERT INTO info_chat (date, message_id)
-                            VALUES ('${curScene.GenDateScene().dateChange}', '${res.message_id}')`;
+          const saveData = `INSERT INTO info_chat (date, message_id, description)
+                            VALUES ('${curScene.GenDateScene().dateChange}', '${res.message_id}',
+                                    '${curScene.GenTextScene().description}')`;
           checkingConn().then(err => {
             conn.query(saveData, async (err, result) => {
-              await determineWinner(ctx)
+              determineWinner(ctx)
             })
             conn.end();
           })
         }
-        
       })
       conn.end();
     })
@@ -105,57 +132,74 @@ bot.action('btn--publish', async (ctx) => {
 })
 
 //Func
+
+
 //Определить победитель
-async function determineWinner(ctx) {
+function determineWinner() {
   const query = "SELECT * FROM info_chat"
   checkingConn().then(err => {
     conn.query(query, (err, result) => {
       result.forEach(item => {
         let drawDate = new Date(item.date)
-        let opts = {
-          chat_id: channel,
-          message_id: item.message_id
+        if (typeof drawDate !== undefined) {
+          if (drawDate > new Date()) {
+            schedule.scheduleJob(drawDate, () => {
+              runRandomizer(item.message_id, item.description)
+            })
+          } else if (new Date() > drawDate) {
+            runRandomizer(item.message_id, item.description)
+          } else {
+            return false
+          }
         }
-        schedule.scheduleJob(drawDate, () => {
-          runRandomizer(ctx, opts)
-        })
       })
     })
     conn.end()
   })
 }
 
+
 //Запустить  рандом
-function runRandomizer(ctx, opts) {
+function runRandomizer(message_id, text) {
   let winner
   let res = []
   const query = "SELECT * FROM user"
-  checkingConn().then(r => {
-    conn.query(query, (err, result, field) => {
+  checkingConn().then(error => {
+    
+    conn.query(query, async (err, result, field) => {
       result.forEach(item => {
         res.push(item.username)
       })
       //Выбираю победителя
       if (typeof res !== undefined && res.length > 0) {
-        winner = res[Math.floor(Math.random() * res.length)]
+        winner = '@' + res[Math.floor(Math.random() * res.length)]
       } else {
         winner = 'Победитель не определен'
       }
-      ctx.editMessageText(`${curScene.GenTextScene().description}\n\nПобедитель: ${winner !== undefined ? winner : "Извините произошла ошибка"}`, opts)
+      await bot.telegram.editMessageText(channel, message_id,
+        message_id,
+        `${text}\n\nПобедитель: ${winner !== undefined ? winner : "Извините произошла ошибка"}`
+      )
       drorDatabase()
     })
     conn.end();
+    
+    
   })
 }
 
 function drorDatabase() {
   //Callback на очищения базы
-  const query = 'DELETE FROM user'
+  const queryUser = 'DELETE FROM user'
+  const queryInfoChat = 'DELETE FROM info_chat'
   checkingConn().then(err => {
-    conn.query(query, (err, result) => {
+    conn.query(queryUser, (err, result, fields) => {
+    })
+    conn.query(queryInfoChat, (err, result, fields) => {
     })
     conn.end();
   })
+  
   
 }
 
@@ -170,4 +214,6 @@ async function checkingConn() {
   }
 }
 
+
+determineWinner();
 bot.launch().then()
