@@ -47,7 +47,7 @@ bot.action('btn--participate', async (ctx) => {
                     conn.query(getUsers, (err, result) => {
                       ctx.editMessageText(`${item.description}`, Markup.inlineKeyboard([
                         [
-                          Markup.button.callback(`Участвую! (${result.length})`, 'btn--participate',)
+                          Markup.button.callback(`Я Участвую / I Participate (${result.length})`, 'btn--participate',)
                         ]
                       ]), {
                         chat_id: channel,
@@ -93,7 +93,7 @@ bot.action('btn--publish', async (ctx) => {
     let res = await ctx.telegram.sendMessage(channel, curScene.GenTextScene().description,
       Markup.inlineKeyboard([
         [
-          Markup.button.callback(`Участвую!`, 'btn--participate',)
+          Markup.button.callback(`Я Участвую / I Participate`, 'btn--participate',)
         ]
       ]))
     
@@ -178,7 +178,7 @@ function runRandomizer(message_id, text) {
       }
       await bot.telegram.editMessageText(channel, message_id,
         message_id,
-        `${text}\n\nПобедитель: ${winner !== undefined ? winner : "Извините произошла ошибка"}`
+        `${text}\n\nПобедитель: ${typeof winner !== undefined ? winner : "Извините произошла ошибка"}`
       )
       drorDatabase()
     })
