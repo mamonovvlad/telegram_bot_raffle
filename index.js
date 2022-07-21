@@ -15,13 +15,23 @@ let config = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
 }
+
 let conn = mysql.createConnection(config)
+
+conn.connect(err => {
+  console.log(err)
+  console.log('con')
+})
 
 bot.use(session())
 bot.use(stage.middleware())
 
 bot.start(async (ctx) => {
-  await ctx.scene.enter('text')
+  if (ctx.from.id === 374869670 || ctx.from.id === 789088476) {
+    await ctx.scene.enter('text')
+  } else {
+    ctx.reply('Извините, вы не являетесь владелецем бота 😜')
+  }
 })
 
 
@@ -58,16 +68,6 @@ bot.action('btn--participate', async (ctx) => {
                     })
                   })
                   ctx.answerCbQuery('Вы участвуете 💸')
-                  
-                  
-                  // ctx.editMessageText(`${curScene.GenTextScene().description}`, Markup.inlineKeyboard([
-                  //   [
-                  //     Markup.button.callback(`Участвую! (${i += 1})`, 'btn--participate',)
-                  //   ]
-                  // ]), {
-                  //   chat_id: channel,
-                  //   message_id: ctx.update.callback_query.message.message_id
-                  // })
                 } else {
                   ctx.answerCbQuery('Вы уже участвуете в розыгрыше')
                 }
@@ -215,5 +215,5 @@ async function checkingConn() {
 }
 
 
-determineWinner();
+// determineWinner();
 bot.launch().then()
