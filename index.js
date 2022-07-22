@@ -34,15 +34,6 @@ bot.command('vladbreyzhopu', async (ctx) => {
 //Участвовать
 bot.action('btn--participate', (ctx) => {
   checkingConn(ctx).then(async err => {
-    let description = `Новый розыгрыш на 100$. Нажми кнопку "Я участвую"
-    Бот автоматически выберет победителя 18.08.2022 в 12:00
-    Для победы обязательны соблюдения условий, описанные на нашем сайте.
-
-    NEW Lottery for $100. Click "I participate" button
-    The bot will automatically choose the winner on 18.2022
-    August at 12:00
-    To win, you must meet the conditions described on the site.`
-    
     if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left') {
       
       const getUsers = `SELECT *
@@ -53,16 +44,6 @@ bot.action('btn--participate', (ctx) => {
       conn.query(getUsersInfo, async (err, resultUsers) => {
         if (typeof resultUsers !== "undefined") {
           ctx.answerCbQuery('Вы участвуете 💸')
-          conn.query(getUsers, (err, result) => {
-            ctx.editMessageText(`${description}`, Markup.inlineKeyboard([
-              [
-                Markup.button.callback(`Я Участвую / I Participate`, 'btn--participate',)
-              ]
-            ]), {
-              chat_id: channel,
-              message_id: ctx.update.callback_query.message.message_id
-            })
-          })
         } else {
           ctx.answerCbQuery('Вы уже участвуете в розыгрыше')
         }
