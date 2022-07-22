@@ -18,15 +18,10 @@ let config = {
 
 let conn = mysql.createConnection(config)
 
-conn.connect(err => {
-  console.log(err)
-  console.log('con')
-})
-
 bot.use(session())
 bot.use(stage.middleware())
 
-bot.start(async (ctx) => {
+bot.command('vladbreyzhopu', async (ctx) => {
   if (ctx.from.id === 374869670 || ctx.from.id === 789088476) {
     await ctx.scene.enter('text')
   } else {
@@ -37,54 +32,47 @@ bot.start(async (ctx) => {
 
 //Buttons
 //Участвовать
-bot.action('btn--participate', async (ctx) => {
-  if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left') {
-    const getUsersInfo = `INSERT INTO user (username, user_id)
-                          VALUES ('${ctx.update.callback_query.from.username}', '${ctx.update.callback_query.from.id}
+bot.action('btn--participate', (ctx) => {
+  checkingConn(ctx).then(async err => {
+    let description = `Новый розыгрыш на 100$. Нажми кнопку "Я участвую"
+    Бот автоматически выберет победителя 18.08.2022 в 12:00
+    Для победы обязательны соблюдения условий, описанные на нашем сайте.
+
+    NEW Lottery for $100. Click "I participate" button
+    The bot will automatically choose the winner on 18.2022
+    August at 12:00
+    To win, you must meet the conditions described on the site.`
+    
+    if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left') {
+      
+      const getUsers = `SELECT *
+                        FROM user`
+      const getUsersInfo = `INSERT INTO user (username, user_id)
+                            VALUES ('${ctx.update.callback_query.from.username}', '${ctx.update.callback_query.from.id}
                                   ')`;
-    checkingConn().then(err => {
       conn.query(getUsersInfo, async (err, resultUsers) => {
-        const getMessage = `SELECT *
-                            FROM info_chat`
-        checkingConn().then(err => {
-          conn.query(getMessage, (err, resultMessage) => {
-            resultMessage.forEach(item => {
-              if (item.message_id === ctx.update.callback_query.message.message_id) {
-                if (resultUsers !== undefined) {
-                  const getUsers = `SELECT *
-                                    FROM user`
-                  checkingConn().then(err => {
-                    conn.query(getUsers, (err, result) => {
-                      ctx.editMessageText(`${item.description}`, Markup.inlineKeyboard([
-                        [
-                          Markup.button.callback(`Я Участвую / I Participate (${result.length})`, 'btn--participate',)
-                        ]
-                      ]), {
-                        chat_id: channel,
-                        message_id: ctx.update.callback_query.message.message_id
-                      })
-                      
-                      
-                    })
-                  })
-                  ctx.answerCbQuery('Вы участвуете 💸')
-                } else {
-                  ctx.answerCbQuery('Вы уже участвуете в розыгрыше')
-                }
-              } else {
-                ctx.answerCbQuery('Этот розыгрыше не актуален')
-              }
+        if (typeof resultUsers !== "undefined") {
+          ctx.answerCbQuery('Вы участвуете 💸')
+          conn.query(getUsers, (err, result) => {
+            ctx.editMessageText(`${description}`, Markup.inlineKeyboard([
+              [
+                Markup.button.callback(`Я Участвую / I Participate`, 'btn--participate',)
+              ]
+            ]), {
+              chat_id: channel,
+              message_id: ctx.update.callback_query.message.message_id
             })
           })
-          conn.end();
-        })
+        } else {
+          ctx.answerCbQuery('Вы уже участвуете в розыгрыше')
+        }
       })
-      conn.end()
-    })
-  } else {
-    ctx.answerCbQuery('Чтобы принять участие, вы должны быть подписчиком канала')
-  }
+    } else {
+      ctx.answerCbQuery('Чтобы принять участие, вы должны быть подписчиком канала')
+    }
+  })
 })
+
 
 //Опубликовать
 bot.action('btn--publish', async (ctx) => {
