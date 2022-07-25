@@ -178,5 +178,5 @@ async function checkingConn() {
 }
 
 
-determineWinner();
+// determineWinner();
 bot.launch().then()
