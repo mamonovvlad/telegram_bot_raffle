@@ -40,7 +40,6 @@ bot.action('btn--participate', (ctx) => {
                             VALUES ('${ctx.update.callback_query.from.username}', '${ctx.update.callback_query.from.id}
                                   ')`;
       conn.query(getUsersInfo, async (err, resultUsers) => {
-        console.log('1')
         if (typeof resultUsers !== "undefined") {
           ctx.answerCbQuery('Вы участвуете 💸')
         } else {
