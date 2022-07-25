@@ -16,6 +16,7 @@ let config = {
   database: process.env.DB_DATABASE,
 }
 
+
 let conn = mysql.createConnection(config)
 
 bot.use(session())
@@ -39,6 +40,7 @@ bot.action('btn--participate', (ctx) => {
                             VALUES ('${ctx.update.callback_query.from.username}', '${ctx.update.callback_query.from.id}
                                   ')`;
       conn.query(getUsersInfo, async (err, resultUsers) => {
+        console.log('1')
         if (typeof resultUsers !== "undefined") {
           ctx.answerCbQuery('Вы участвуете 💸')
         } else {
@@ -106,19 +108,23 @@ function determineWinner() {
   const query = "SELECT * FROM info_chat"
   checkingConn().then(err => {
     conn.query(query, (err, result) => {
-      result.forEach(item => {
-        let drawDate = new Date(item.date)
-        console.log(drawDate)
-        if (typeof drawDate !== undefined || drawDate.length > 0) {
-          if (drawDate > new Date()) {
-            schedule.scheduleJob(drawDate, () => {
-              runRandomizer(item.message_id, item.description)
-            })
-          } else if (new Date() > drawDate) {
-            runRandomizer(item.message_id, item.description)
+      if (typeof result !== undefined && result.length > 0) {
+        console.log(result, 'info chat ')
+        result.forEach(item => {
+          let drawDate = new Date(item.date)
+          if (typeof drawDate !== undefined && drawDate !== null) {
+            if (item.message_id !== null && item.description !== null) {
+              if (new Date() > drawDate) {
+                runRandomizer(item.message_id, item.description)
+              } else {
+                schedule.scheduleJob(drawDate, () => {
+                  runRandomizer(item.message_id, item.description)
+                })
+              }
+            }
           }
-        }
-      })
+        })
+      }
     })
     conn.end()
   })
@@ -178,5 +184,5 @@ async function checkingConn() {
 }
 
 
-// determineWinner();
+determineWinner();
 bot.launch().then()
