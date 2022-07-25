@@ -35,9 +35,6 @@ bot.command('vladbreyzhopu', async (ctx) => {
 bot.action('btn--participate', (ctx) => {
   checkingConn(ctx).then(async err => {
     if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left') {
-      
-      const getUsers = `SELECT *
-                        FROM user`
       const getUsersInfo = `INSERT INTO user (username, user_id)
                             VALUES ('${ctx.update.callback_query.from.username}', '${ctx.update.callback_query.from.id}
                                   ')`;
@@ -51,6 +48,7 @@ bot.action('btn--participate', (ctx) => {
     } else {
       ctx.answerCbQuery('Чтобы принять участие, вы должны быть подписчиком канала')
     }
+    conn.end()
   })
 })
 
@@ -110,15 +108,14 @@ function determineWinner() {
     conn.query(query, (err, result) => {
       result.forEach(item => {
         let drawDate = new Date(item.date)
-        if (typeof drawDate !== undefined) {
+        console.log(drawDate)
+        if (typeof drawDate !== undefined || drawDate.length > 0) {
           if (drawDate > new Date()) {
             schedule.scheduleJob(drawDate, () => {
               runRandomizer(item.message_id, item.description)
             })
           } else if (new Date() > drawDate) {
             runRandomizer(item.message_id, item.description)
-          } else {
-            return false
           }
         }
       })
@@ -134,7 +131,6 @@ function runRandomizer(message_id, text) {
   let res = []
   const query = "SELECT * FROM user"
   checkingConn().then(error => {
-    
     conn.query(query, async (err, result, field) => {
       result.forEach(item => {
         res.push(item.username)
@@ -152,8 +148,6 @@ function runRandomizer(message_id, text) {
       drorDatabase()
     })
     conn.end();
-    
-    
   })
 }
 
@@ -184,5 +178,5 @@ async function checkingConn() {
 }
 
 
-// determineWinner();
+determineWinner();
 bot.launch().then()
