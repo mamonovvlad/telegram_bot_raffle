@@ -34,7 +34,6 @@ bot.command('vladbreyzhopu', async (ctx) => {
 //Buttons
 //Участвовать
 bot.action('btn--participate', (ctx) => {
-  console.log(ctx.update)
   checkingConn(ctx).then(async err => {
     if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left') {
       const getUsersInfo = `INSERT INTO user (username, user_id)
