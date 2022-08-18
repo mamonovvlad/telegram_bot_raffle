@@ -21,7 +21,7 @@ let conn = mysql.createConnection(config)
 
 bot.use(session())
 bot.use(stage.middleware())
-
+//start
 bot.command('vladbreyzhopu', async (ctx) => {
   if (ctx.from.id === 374869670 || ctx.from.id === 789088476) {
     await ctx.scene.enter('text')
@@ -40,7 +40,7 @@ bot.action('btn--participate', (ctx) => {
                             VALUES ('${ctx.update.callback_query.from.username}', '${ctx.update.callback_query.from.id}
                                   ')`;
       conn.query(getUsersInfo, async (err, resultUsers) => {
-        if (typeof resultUsers !== "undefined") {
+        if (typeof resultUsers !== "undefined" && ctx.update.callback_query.from.username) {
           ctx.answerCbQuery('Вы участвуете 💸')
         } else {
           ctx.answerCbQuery('Вы уже участвуете в розыгрыше')
@@ -108,7 +108,6 @@ function determineWinner() {
   checkingConn().then(err => {
     conn.query(query, (err, result) => {
       if (typeof result !== undefined && result.length > 0) {
-        console.log(result, 'info chat ')
         result.forEach(item => {
           let drawDate = new Date(item.date)
           if (typeof drawDate !== undefined && drawDate !== null) {
