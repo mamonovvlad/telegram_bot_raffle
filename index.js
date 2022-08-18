@@ -21,9 +21,9 @@ let conn = mysql.createConnection(config)
 
 bot.use(session())
 bot.use(stage.middleware())
-//start
-bot.command('vladbreyzhopu', async (ctx) => {
-  if (ctx.from.id === 374869670 || ctx.from.id === 789088476) {
+
+bot.command('start', async (ctx) => {
+  if (ctx.from.id === 374869670 || ctx.from.id === 789088476 || ctx.from.id === 339526792) {
     await ctx.scene.enter('text')
   } else {
     ctx.reply('Извините, вы не являетесь владелецем бота 😜')
@@ -35,6 +35,7 @@ bot.command('vladbreyzhopu', async (ctx) => {
 //Участвовать
 bot.action('btn--participate', (ctx) => {
   checkingConn(ctx).then(async err => {
+    console.log(ctx.update.callback_query.from)
     if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left') {
       const getUsersInfo = `INSERT INTO user (username, user_id)
                             VALUES ('${ctx.update.callback_query.from.username}', '${ctx.update.callback_query.from.id}
