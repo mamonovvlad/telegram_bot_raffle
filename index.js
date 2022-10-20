@@ -35,12 +35,12 @@ bot.command('start', async (ctx) => {
 //Участвовать
 bot.action('btn--participate', (ctx) => {
   checkingConn(ctx).then(async err => {
-    if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left') {
+    if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left' && typeof ctx.update.callback_query.from.username !== 'undefined') {
       const getUsersInfo = `INSERT INTO user (username, user_id)
                             VALUES ('${ctx.update.callback_query.from.username}', '${ctx.update.callback_query.from.id}
                                   ')`;
       conn.query(getUsersInfo, async (err, resultUsers) => {
-        if (typeof resultUsers !== "undefined" && ctx.update.callback_query.from.username) {
+        if (typeof resultUsers !== 'undefined' && ctx.update.callback_query.from.username) {
           ctx.answerCbQuery('Вы участвуете 💸')
         } else {
           ctx.answerCbQuery('Вы уже участвуете в розыгрыше')
