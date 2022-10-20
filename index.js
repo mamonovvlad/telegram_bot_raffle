@@ -35,7 +35,6 @@ bot.command('start', async (ctx) => {
 //Участвовать
 bot.action('btn--participate', (ctx) => {
   checkingConn(ctx).then(async err => {
-    console.log(ctx.update.callback_query.from)
     if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left') {
       const getUsersInfo = `INSERT INTO user (username, user_id)
                             VALUES ('${ctx.update.callback_query.from.username}', '${ctx.update.callback_query.from.id}
@@ -47,13 +46,12 @@ bot.action('btn--participate', (ctx) => {
           ctx.answerCbQuery('Вы уже участвуете в розыгрыше')
         }
       })
+      conn.end()
     } else {
       ctx.answerCbQuery('Чтобы принять участие, вы должны быть подписчиком канала')
     }
-    conn.end()
   })
 })
-
 
 //Опубликовать
 bot.action('btn--publish', async (ctx) => {
@@ -100,9 +98,6 @@ bot.action('btn--publish', async (ctx) => {
   }
 })
 
-//Func
-
-
 //Определить победитель
 function determineWinner() {
   const query = "SELECT * FROM info_chat"
@@ -128,7 +123,6 @@ function determineWinner() {
     conn.end()
   })
 }
-
 
 //Запустить  рандом
 function runRandomizer(message_id, text) {
@@ -167,8 +161,6 @@ function drorDatabase() {
     })
     conn.end();
   })
-  
-  
 }
 
 async function checkingConn() {
@@ -181,7 +173,6 @@ async function checkingConn() {
     conn = mysql.createConnection(config)
   }
 }
-
 
 determineWinner();
 bot.launch().then()
