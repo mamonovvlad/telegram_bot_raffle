@@ -16,7 +16,6 @@ let config = {
     database: process.env.DB_DATABASE,
 }
 
-
 let conn = mysql.createConnection(config)
 
 bot.use(session())
@@ -34,23 +33,26 @@ bot.command('start', async (ctx) => {
 //Buttons
 //Участвовать
 bot.action('btn--participate', (ctx) => {
-    const getUsersInfo = `INSERT INTO user (username, user_id)
-                          VALUES ('${ctx.update.callback_query.from.username}', '${ctx.update.callback_query.from.id}
-                                  ')`;
+
     checkingConn(ctx).then(async err => {
-        conn.query(getUsersInfo, async (err, resultUsers) => {
             if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left' && typeof ctx.update.callback_query.from.username !== 'undefined') {
+              const getUsersInfo = `INSERT INTO user (username, user_id)
+                                    VALUES ('${ctx.update.callback_query.from.username}',
+                                            '${ctx.update.callback_query.from.id}
+                                  ')`;
+              conn.query(getUsersInfo, async (err, resultUsers) => {
                 if (typeof resultUsers !== 'undefined' && ctx.update.callback_query.from.username) {
-                    ctx.answerCbQuery('Вы участвуете 💸')
+                  ctx.answerCbQuery('Вы участвуете 💸')
                 } else {
-                    ctx.answerCbQuery('Вы уже участвуете в розыгрыше')
+                  ctx.answerCbQuery('Вы уже участвуете в розыгрыше')
                 }
+              })
+              conn.end();
             } else {
-                ctx.answerCbQuery('Чтобы принять участие, вы должны быть подписчиком канала')
+              ctx.answerCbQuery('Чтобы принять участие, вы должны быть подписчиком канала')
             }
-        })
-        conn.end();
     })
+
 })
 
 //Опубликовать
