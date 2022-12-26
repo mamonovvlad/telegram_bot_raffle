@@ -33,7 +33,6 @@ bot.command('start', async (ctx) => {
 //Buttons
 //Участвовать
 bot.action('btn--participate', (ctx) => {
-
     checkingConn(ctx).then(async err => {
             if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left' && typeof ctx.update.callback_query.from.username !== 'undefined') {
               const getUsersInfo = `INSERT INTO user (username, user_id)
@@ -42,17 +41,17 @@ bot.action('btn--participate', (ctx) => {
                                   ')`;
               conn.query(getUsersInfo, async (err, resultUsers) => {
                 if (typeof resultUsers !== 'undefined' && ctx.update.callback_query.from.username) {
-                  ctx.answerCbQuery('Вы участвуете 💸')
+                  ctx.answerCbQuery('Вы участвуете 💸');
+                  conn.end();
                 } else {
-                  ctx.answerCbQuery('Вы уже участвуете в розыгрыше')
+                  ctx.answerCbQuery('Вы уже участвуете в розыгрыше');
+                  conn.end();
                 }
-              })
-              conn.end();
+              });
             } else {
               ctx.answerCbQuery('Чтобы принять участие, вы должны быть подписчиком канала')
             }
     })
-
 })
 
 //Опубликовать
