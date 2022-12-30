@@ -44,10 +44,15 @@ bot.action('btn--participate', (ctx) => {
         conn.query(getUsersInfo, async (err, resultUsers) => {
           if (typeof resultUsers !== 'undefined' && ctx.update.callback_query.from.username) {
             ctx.answerCbQuery('Вы участвуете 💸')
+            conn.end();
+            console.log('Вы участвуете')
           } else {
             ctx.answerCbQuery('Вы уже участвуете в розыгрыше');
+            console.log('Вы уже участвуете в розыгрыше')
+            conn.end();
           }
         });
+        console.log('conn.end')
         conn.end();
       } else {
         ctx.answerCbQuery('Чтобы принять участие, вы должны быть подписчиком канала');
