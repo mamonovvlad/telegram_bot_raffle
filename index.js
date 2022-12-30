@@ -51,13 +51,15 @@ bot.action('btn--participate', (ctx) => {
             console.log('Вы уже участвуете в розыгрыше')
             conn.end();
           }
+          console.log('conn.end0')
         });
-        console.log('conn.end')
+        console.log('conn.end 1')
         conn.end();
       } else {
         ctx.answerCbQuery('Чтобы принять участие, вы должны быть подписчиком канала');
         conn.end();
       }
+      console.log('conn.end 2')
     })
 })
 
