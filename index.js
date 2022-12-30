@@ -54,10 +54,8 @@ bot.action('btn--participate', (ctx) => {
           console.log('conn.end0')
         });
         //1
-        conn.end();
       } else {
         ctx.answerCbQuery('Чтобы принять участие, вы должны быть подписчиком канала');
-        conn.end();
       }
       //2
     })
