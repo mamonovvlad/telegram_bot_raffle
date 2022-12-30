@@ -44,14 +44,13 @@ bot.action('btn--participate', (ctx) => {
         conn.query(getUsersInfo, async (err, resultUsers) => {
           if (typeof resultUsers !== 'undefined' && ctx.update.callback_query.from.username) {
             ctx.answerCbQuery('Вы участвуете 💸')
-            conn.end();
-            console.log('Вы участвуете')
+            //3
           } else {
             ctx.answerCbQuery('Вы уже участвуете в розыгрыше');
-            console.log('Вы уже участвуете в розыгрыше')
-            conn.end();
+            //3
           }
-          console.log('conn.end0')
+          //4
+          conn.end();
         });
         //1
       } else {
