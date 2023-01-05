@@ -50,14 +50,16 @@ bot.action('btn--participate', (ctx) => {
             //3
           }
           //4
-          conn.end();
         });
         //1
       } else {
         ctx.answerCbQuery('Чтобы принять участие, вы должны быть подписчиком канала');
+        console.log('подписчиком канала')
       }
       //2
     })
+  console.log('5')
+  conn.end();
 })
 
 //Опубликовать
