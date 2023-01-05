@@ -50,6 +50,7 @@ bot.action('btn--participate', (ctx) => {
             //3
           }
           //4
+          conn.end();
         });
         //1
       } else {
@@ -59,7 +60,6 @@ bot.action('btn--participate', (ctx) => {
       //2
     })
   console.log('5')
-  conn.end();
 })
 
 //Опубликовать
