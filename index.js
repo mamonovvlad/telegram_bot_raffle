@@ -16,8 +16,6 @@ let config = {
   database: process.env.DB_DATABASE,
 }
 
-
-
 let conn = mysql.createConnection(config)
 
 bot.use(session())
@@ -36,30 +34,22 @@ bot.command('start', async (ctx) => {
 //Участвовать
 bot.action('btn--participate', (ctx) => {
     checkingConn(ctx).then(async err => {
-      if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left' && typeof ctx.update.callback_query.from.username !== 'undefined') {
+      if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left' && ctx.update.callback_query.from.username !== undefined && ctx.update.callback_query.from.id !== undefined) {
         const getUsersInfo = `INSERT INTO user (username, user_id)
                               VALUES ('${ctx.update.callback_query.from.username}',
-                                      '${ctx.update.callback_query.from.id}
-                                  ')`;
+                                      '${ctx.update.callback_query.from.id}')`;
         conn.query(getUsersInfo, async (err, resultUsers) => {
           if (typeof resultUsers !== 'undefined' && ctx.update.callback_query.from.username) {
             ctx.answerCbQuery('Вы участвуете 💸')
-            //3
           } else {
             ctx.answerCbQuery('Вы уже участвуете в розыгрыше');
-            //3
           }
-          //4
-          conn.end();
         });
-        //1
+        conn.end();
       } else {
         ctx.answerCbQuery('Чтобы принять участие, вы должны быть подписчиком канала');
-        console.log('подписчиком канала')
       }
-      //2
     })
-  console.log('5')
 })
 
 //Опубликовать
@@ -151,7 +141,7 @@ function runRandomizer(message_id, text) {
             }
             await bot.telegram.editMessageText(channel, message_id,
                 message_id,
-                `${text}\n\nПобедитель: ${typeof winner !== undefined ? winner : "Извините произошла ошибка"}`
+                `${text}\n\nПобедитель: ${winner !== undefined ? winner : "Извините произошла ошибка"}`
             )
             drorDatabase()
         })
