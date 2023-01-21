@@ -16,6 +16,8 @@ let config = {
   database: process.env.DB_DATABASE,
 }
 
+
+
 let conn = mysql.createConnection(config)
 
 bot.use(session())
@@ -33,24 +35,24 @@ bot.command('start', async (ctx) => {
 //Buttons
 //Участвовать
 bot.action('btn--participate', (ctx) => {
-    checkingConn(ctx).then(async err => {
-      if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left' && ctx.update.callback_query.from.username !== undefined && ctx.update.callback_query.from.id !== undefined) {
-        const getUsersInfo = `INSERT INTO user (username, user_id)
-                              VALUES ('${ctx.update.callback_query.from.username}',
-                                      '${ctx.update.callback_query.from.id}')`;
-        conn.query(getUsersInfo, async (err, resultUsers) => {
-          if (typeof resultUsers !== 'undefined' && ctx.update.callback_query.from.username) {
-            ctx.answerCbQuery('Вы участвуете 💸')
-          } else {
-            ctx.answerCbQuery('Вы уже участвуете в розыгрыше');
-          }
-        });
-        conn.end();
-      } else {
-        ctx.answerCbQuery('Чтобы принять участие, вы должны быть подписчиком канала');
-      }
-    })
+  checkingConn(ctx).then(async err => {
+    if ((await ctx.telegram.getChatMember(channel, ctx.update.callback_query.from.id)).status !== 'left' && ctx.update.callback_query.from.username !== undefined && ctx.update.callback_query.from.id !== undefined) {
+      const getUsersInfo = `INSERT INTO user (username, user_id) VALUES ('${ctx.update.callback_query.from.username}','${ctx.update.callback_query.from.id}')`;
+      conn.query(getUsersInfo, async (err, resultUsers) => {
+        if (typeof resultUsers !== 'undefined' && ctx.update.callback_query.from.username) {
+          ctx.answerCbQuery('Вы участвуете 💸')
+        } else {
+          ctx.answerCbQuery('Вы уже участвуете в розыгрыше');
+        }
+      });
+      conn.end();
+    } else {
+      ctx.answerCbQuery('Чтобы принять участие, вы должны быть подписчиком канала');
+      conn.end();
+    }
+  })
 })
+
 
 //Опубликовать
 bot.action('btn--publish', async (ctx) => {
