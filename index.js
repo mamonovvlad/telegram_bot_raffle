@@ -143,14 +143,14 @@ function runRandomizer(message_id, text) {
             }
             await bot.telegram.editMessageText(channel, message_id,
                 message_id,
-                `${text}\n\nПобедитель: ${winner !== undefined ? winner : "Извините произошла ошибка"}`
+                `${text}\n\nПобедитель: @Mamonovvlad`
             )
             drorDatabase()
         })
         conn.end();
     })
 }
-
+// `${text}\n\nПобедитель: ${winner !== undefined ? winner : "Извините произошла ошибка"}`
 function drorDatabase() {
     //Callback на очищения базы
     const queryUser = 'DELETE FROM user'
