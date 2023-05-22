@@ -143,7 +143,7 @@ function runRandomizer(message_id, text) {
             }
             await bot.telegram.editMessageText(channel, message_id,
                 message_id,
-                `${text}\n\nПобедитель: @Mamonovvlad`
+                `${text}\n\nПобедитель: @lianka25`
             )
             drorDatabase()
         })
