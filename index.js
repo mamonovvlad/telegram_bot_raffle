@@ -150,7 +150,7 @@ function runRandomizer(message_id, text) {
         conn.end();
     })
 }
-// `${text}\n\nПобедитель: ${winner !== undefined ? winner : "Извините произошла ошибка"}`
+//// `${text}\n\nПобедитель: ${winner !== undefined ? winner : "Извините произошла ошибка"}`
 function drorDatabase() {
     //Callback на очищения базы
     const queryUser = 'DELETE FROM user'
